@@ -1,0 +1,7 @@
+h1. htmlGenerator ver 1.0
+
+h3. Author : Jain Basil Aliyas (jainbasil@gmail.com)
+Home Page : http://jainbasil.net
+
+
+*htmlGenerator* is a simple python script which will parse Wordpress Extended RSS xml file and save all the posts as html files. These html files generated will be jekyll friendly, as it names the file in format yyyy-mm-dd-title-of-the-post.html. This will also add categories and tags in your posts to their html output.
