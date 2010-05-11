@@ -28,18 +28,32 @@ def convert(infile):
     	post["postdate"] =''.join(node.getElementsByTagName('wp:post_date')[0].firstChild.data.split(' ')[0])
     	post["posttype"] = node.getElementsByTagName('wp:post_type')[0].firstChild.data
 	if node.getElementsByTagName('content:encoded')[0].firstChild != None:
-    	    post["text"] = node.getElementsByTagName(
-    	                    'content:encoded')[0].firstChild.data
+    	    post["text"] = node.getElementsByTagName('content:encoded')[0].firstChild.data
     	else:
     	    post["text"] = ""
     	
-
-    	# Get the categories
+    	# Get the categories and tags
     	tempCategories = []
+	tempTags=[]
     	for subnode in node.getElementsByTagName('category'):
-    		 tempCategories.append(subnode.getAttribute('nicename'))
-    	categories = [x for x in tempCategories if x != '']
+		if subnode.getAttribute('domain') == "category":
+			tempCategories.append(subnode.firstChild.data)
+		if subnode.getAttribute('domain') == "tag":
+			tempTags.append(subnode.firstChild.data)
+	
+	# I got all the tags twice in the list, so I am just removing the duplicates by following line. I don't know whether this is found in all the xml files.
+	tempTags = list(set(tempTags))
+    	
+	# My category list had one named Tips &amp; Tricks. It will create an error if we give & in the category name. So, I am replaving that with ''
+	for c in tempCategories:
+		print c
+		c = c.replace(' &amp; ','-')
+		c = c.replace(' ','-')
+		print c
+	categories = [x for x in tempCategories if x != '']
+	tags = [x for x in tempTags if x != '']
     	post["categories"] = categories 
+	post["tags"] = tags
 
     	# Add post to the list of all posts
     	blog.append(post)
@@ -60,8 +74,24 @@ def convert(infile):
 		filename = filename.replace('/',' ')
         	f = open(filename, 'w')
 		titletemp = title.replace(':',' ')
-		tags = "---\nlayout: post\ntitle: "+titletemp + "\n---\n"
-		f.write(tags)
+		fileTitle = "---\nlayout: post\ntitle: "+titletemp + "\n"
+		
+		#Adding categories into file
+		Category = "categories:\n"
+		for c in post["categories"]:
+			c = c.encode('utf-8')
+			Category = Category + '- '+ c +"\n"
+
+		# Adding Tags into file
+		Tags = "tags:\n"
+		for t in post["tags"]:
+			t = t.encode('utf-8')
+			Tags = Tags + '- ' + t + "\n"
+		Tags = Tags + "---\n"
+
+		f.write(fileTitle)
+		f.write(Category)
+		f.write(Tags)
 		f.write(meta+"\n")
         	
         	# Add "HTML header"
