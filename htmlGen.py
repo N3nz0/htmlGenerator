@@ -45,12 +45,13 @@ def convert(infile):
 	tempTags = list(set(tempTags))
     	
 	# My category list had one named Tips &amp; Tricks. It will create an error if we give & in the category name. So, I am replaving that with ''
+	Categories = []
 	for c in tempCategories:
-		print c
 		c = c.replace(' &amp; ','-')
 		c = c.replace(' ','-')
-		print c
-	categories = [x for x in tempCategories if x != '']
+		Categories.append(c)
+	
+	categories = [x for x in Categories if x != '']
 	tags = [x for x in tempTags if x != '']
     	post["categories"] = categories 
 	post["tags"] = tags
@@ -76,22 +77,27 @@ def convert(infile):
 		titletemp = title.replace(':',' ')
 		fileTitle = "---\nlayout: post\ntitle: "+titletemp + "\n"
 		
+		f.write(fileTitle)
+
 		#Adding categories into file
-		Category = "categories:\n"
-		for c in post["categories"]:
-			c = c.encode('utf-8')
-			Category = Category + '- '+ c +"\n"
+		if post["categories"]:
+			Category = "categories:\n"
+			for c in post["categories"]:
+				c = c.encode('utf-8')
+				Category = Category + '- '+ c +"\n"
+			f.write(Category)
 
 		# Adding Tags into file
-		Tags = "tags:\n"
-		for t in post["tags"]:
-			t = t.encode('utf-8')
-			Tags = Tags + '- ' + t + "\n"
-		Tags = Tags + "---\n"
+		if post["tags"]:
+			Tags = "tags:\n"
+			for t in post["tags"]:
+				t = t.encode('utf-8')
+				Tags = Tags + '- ' + t + "\n"
+			f.write(Tags)
 
-		f.write(fileTitle)
-		f.write(Category)
-		f.write(Tags)
+		footer = "---\n"
+		f.write(footer)
+		
 		f.write(meta+"\n")
         	
         	# Add "HTML header"
